@@ -1,0 +1,21 @@
+{
+  "name": "webrtc-tutorial",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "step-1": "cd steps/1_same-page; serve .",
+    "step-2": "cd steps/2_with-broadcast-channel; serve .",
+    "step-3": "cd steps/3_with-signaling-server; nodemon server/index.js & serve ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "serve": "^14.2.1"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
