@@ -1,0 +1,46 @@
+<body>
+  <video id="remote" autoplay controls></video>
+  
+
+  <script>
+    // get video elements
+    const remote = document.querySelector("video#remote");
+    let remotePC;
+
+    const signalingObject = new BroadcastChannel("stream-video");
+    signalingObject.onmessage = e => {
+      if (e.data.type === "icecandidate") {
+        remotePC?.addIceCandidate(e.data.candidate)
+      } else if (e.data.type === "offer") {
+        console.log("Received offer")
+        handleOffer(e.data)
+      }
+    }
+
+    function handleOffer(offer) {
+      remotePC = new RTCPeerConnection();
+      remotePC.addEventListener("track", e => remote.srcObject = e.streams[0]);
+      remotePC.addEventListener("icecandidate", e => {
+        let candidate = null;
+        if (e.candidate !== null) {
+          candidate = {
+            candidate: e.candidate.candidate,
+            sdpMid: e.candidate.sdpMid,
+            sdpMLineIndex: e.candidate.sdpMLineIndex,
+          }
+        }
+        signalingObject.postMessage({ type: "icecandidate", candidate })
+      });
+      remotePC.setRemoteDescription(offer)
+        .then(() => remotePC.createAnswer())
+        .then(async answer => {
+          await remotePC.setLocalDescription(answer);
+          console.log("Created answer, sending...")
+          signalingObject.postMessage({
+            type: "answer",
+            sdp: answer.sdp,
+          });
+        });
+    }
+  </script>
+</body>
