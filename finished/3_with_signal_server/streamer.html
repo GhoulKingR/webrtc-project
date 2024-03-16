@@ -1,0 +1,58 @@
+<body>
+  <video id="local" autoplay muted></video>
+  <button onclick="start(this)">start video</button>
+  <button id="stream" onclick="stream(this)" disabled>stream video</button>
+
+  <script src="signalobject.js"></script>
+  <script>
+    // get video elements
+    const local = document.querySelector("video#local");
+    let localPC;
+
+    const signalingObject = new SignalServer("stream-video");
+    signalingObject.onmessage = e => {
+      if (e.data.type === "icecandidate") {
+        localPC?.addIceCandidate(e.data.candidate)
+      } else if (e.data.type === "answer") {
+        console.log("Received answer")
+        localPC?.setRemoteDescription(e.data);
+      }
+    }
+
+    // function to ask for camera and microphone permission
+    // and stream to #local video element
+    function start(e) {
+      e.disabled = true;
+      document.getElementById("stream").disabled = false;  // enable the stream button
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        .then((stream) => local.srcObject = stream);
+    }
+
+    function stream(e) {
+      e.disabled = true;
+      localPC = new RTCPeerConnection();  // local peer connection
+
+      localPC.addEventListener("icecandidate", e => {
+        let candidate = null;
+        if (e.candidate !== null) {
+          candidate = {
+            candidate: e.candidate.candidate,
+            sdpMid: e.candidate.sdpMid,
+            sdpMLineIndex: e.candidate.sdpMLineIndex,
+          }
+        }
+        signalingObject.postMessage({ type: "icecandidate", candidate })
+      });
+
+      local.srcObject.getTracks()
+        .forEach(track => localPC.addTrack(track, local.srcObject))
+        
+      localPC.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
+        .then(async offer => {
+          await localPC.setLocalDescription(offer);
+          console.log("Created offer, sending...")
+          signalingObject.postMessage({ type: "offer", sdp: offer.sdp });
+        });
+    }
+  </script>
+</body>
