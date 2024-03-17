@@ -13,33 +13,43 @@
     // and stream to #local video element
     function start(e) {
       e.disabled = true;
-      document.getElementById("stream").disabled = false;  // enable the stream button
       navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        .then((stream) => local.srcObject = stream);
+        .then((stream) => {
+          local.srcObject = stream;
+          document.getElementById("stream").disabled = false;  // enable the stream button
+        })
+        .catch(() => e.disabled = false);
     }
 
     function stream(e) {
+      // disable the stream button
       e.disabled = true;
-      const localPC = new RTCPeerConnection();  // local peer connection
-      const remotePC = new RTCPeerConnection();  // remote peer connection
+      
+      const localPeer = new RTCPeerConnection();  // local peer
+      const remotePeer = new RTCPeerConnection();  // remote peer
 
-      localPC.addEventListener("icecandidate", e => remotePC.addIceCandidate(e.candidate));
-      remotePC.addEventListener("icecandidate", e => localPC.addIceCandidate(e.candidate));
-      remotePC.addEventListener("track", e => remote.srcObject = e.streams[0]);
+      // if an icecandidate event is triggered in a peer add the ice candidate to the other peer
+      localPeer.addEventListener("icecandidate", e => { console.log("Local:", e.candidate); remotePeer.addIceCandidate(e.candidate) });
+      remotePeer.addEventListener("icecandidate", e => { console.log("Remote:", e.candidate); localPeer.addIceCandidate(e.candidate) });
 
+      // if the remote peer detects a track in the connection, it forwards it to the remote video element
+      remotePeer.addEventListener("track", e => remote.srcObject = e.streams[0]);
+
+      // get camera and microphone source tracks and add it to the local peer
       local.srcObject.getTracks()
-        .forEach(track => localPC.addTrack(track, local.srcObject));
-        
-      localPC.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
+        .forEach(track => localPeer.addTrack(track, local.srcObject));
+      
+      // Start the handshake process
+      localPeer.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
         .then(async offer => {
-          await localPC.setLocalDescription(offer);
-          await remotePC.setRemoteDescription(offer);
+          await localPeer.setLocalDescription(offer);
+          await remotePeer.setRemoteDescription(offer);
           console.log("Created offer");
         })
-        .then(() => remotePC.createAnswer())
+        .then(() => remotePeer.createAnswer())
         .then(async answer => {
-          await remotePC.setLocalDescription(answer);
-          await localPC.setRemoteDescription(answer);
+          await remotePeer.setLocalDescription(answer);
+          await localPeer.setRemoteDescription(answer);
           console.log("Created answer");
         });
     }
