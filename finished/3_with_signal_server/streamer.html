@@ -7,15 +7,15 @@
   <script>
     // get video elements
     const local = document.querySelector("video#local");
-    let localPC;
+    let peerConnection;
 
     const signalingObject = new SignalServer("stream-video");
     signalingObject.onmessage = e => {
       if (e.data.type === "icecandidate") {
-        localPC?.addIceCandidate(e.data.candidate)
+        peerConnection?.addIceCandidate(e.data.candidate);
       } else if (e.data.type === "answer") {
-        console.log("Received answer")
-        localPC?.setRemoteDescription(e.data);
+        console.log("Received answer");
+        peerConnection?.setRemoteDescription(e.data);
       }
     }
 
@@ -30,27 +30,27 @@
 
     function stream(e) {
       e.disabled = true;
-      localPC = new RTCPeerConnection();  // local peer connection
+      peerConnection = new RTCPeerConnection();  // local peer connection
 
-      localPC.addEventListener("icecandidate", e => {
+      peerConnection.addEventListener("icecandidate", e => {
         let candidate = null;
         if (e.candidate !== null) {
           candidate = {
             candidate: e.candidate.candidate,
             sdpMid: e.candidate.sdpMid,
             sdpMLineIndex: e.candidate.sdpMLineIndex,
-          }
+          };
         }
-        signalingObject.postMessage({ type: "icecandidate", candidate })
+        signalingObject.postMessage({ type: "icecandidate", candidate });
       });
 
       local.srcObject.getTracks()
-        .forEach(track => localPC.addTrack(track, local.srcObject))
+        .forEach(track => peerConnection.addTrack(track, local.srcObject));
         
-      localPC.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
+      peerConnection.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
         .then(async offer => {
-          await localPC.setLocalDescription(offer);
-          console.log("Created offer, sending...")
+          await peerConnection.setLocalDescription(offer);
+          console.log("Created offer, sending...");
           signalingObject.postMessage({ type: "offer", sdp: offer.sdp });
         });
     }

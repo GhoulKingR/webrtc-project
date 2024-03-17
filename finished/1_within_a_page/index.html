@@ -28,19 +28,19 @@
       remotePC.addEventListener("track", e => remote.srcObject = e.streams[0]);
 
       local.srcObject.getTracks()
-        .forEach(track => localPC.addTrack(track, local.srcObject))
+        .forEach(track => localPC.addTrack(track, local.srcObject));
         
       localPC.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
         .then(async offer => {
           await localPC.setLocalDescription(offer);
           await remotePC.setRemoteDescription(offer);
-          console.log("Created offer")
+          console.log("Created offer");
         })
         .then(() => remotePC.createAnswer())
         .then(async answer => {
           await remotePC.setLocalDescription(answer);
           await localPC.setRemoteDescription(answer);
-          console.log("Created answer")
+          console.log("Created answer");
         });
     }
   </script>
