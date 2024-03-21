@@ -31,8 +31,11 @@
       e.disabled = true;
       peerConnection = new RTCPeerConnection();  // local peer connection
 
+      // add ice candidate event listener
       peerConnection.addEventListener("icecandidate", e => {
         let candidate = null;
+        
+        // prepare a candidate object that can be passed through browser channel
         if (e.candidate !== null) {
           candidate = {
             candidate: e.candidate.candidate,
@@ -43,9 +46,12 @@
         channel.postMessage({ type: "icecandidate", candidate });
       });
 
+      // add media tracks to the peer connection
       local.srcObject.getTracks()
         .forEach(track => peerConnection.addTrack(track, local.srcObject));
         
+
+      // Create offer and send through the browser channel
       peerConnection.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true })
         .then(async offer => {
           await peerConnection.setLocalDescription(offer);

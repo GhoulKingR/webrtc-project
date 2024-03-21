@@ -1,5 +1,5 @@
 <body>
-  <video id="remote" autoplay controls></video>
+  <video id="remote" controls></video>
   
 
   <script>
@@ -7,8 +7,8 @@
     const remote = document.querySelector("video#remote");
     let remotePC;
 
-    const signalingObject = new BroadcastChannel("stream-video");
-    signalingObject.onmessage = e => {
+    const channel = new BroadcastChannel("stream-video");
+    channel.onmessage = e => {
       if (e.data.type === "icecandidate") {
         remotePC?.addIceCandidate(e.data.candidate)
       } else if (e.data.type === "offer") {
@@ -29,14 +29,14 @@
             sdpMLineIndex: e.candidate.sdpMLineIndex,
           }
         }
-        signalingObject.postMessage({ type: "icecandidate", candidate })
+        channel.postMessage({ type: "icecandidate", candidate })
       });
       remotePC.setRemoteDescription(offer)
         .then(() => remotePC.createAnswer())
         .then(async answer => {
           await remotePC.setLocalDescription(answer);
           console.log("Created answer, sending...")
-          signalingObject.postMessage({
+          channel.postMessage({
             type: "answer",
             sdp: answer.sdp,
           });
