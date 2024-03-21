@@ -8,8 +8,8 @@
     const local = document.querySelector("video#local");
     let peerConnection;
 
-    const signalingObject = new BroadcastChannel("stream-video");
-    signalingObject.onmessage = e => {
+    const channel = new BroadcastChannel("stream-video");
+    channel.onmessage = e => {
       if (e.data.type === "icecandidate") {
         peerConnection?.addIceCandidate(e.data.candidate);
       } else if (e.data.type === "answer") {
@@ -40,7 +40,7 @@
             sdpMLineIndex: e.candidate.sdpMLineIndex,
           };
         }
-        signalingObject.postMessage({ type: "icecandidate", candidate });
+        channel.postMessage({ type: "icecandidate", candidate });
       });
 
       local.srcObject.getTracks()
@@ -50,7 +50,7 @@
         .then(async offer => {
           await peerConnection.setLocalDescription(offer);
           console.log("Created offer, sending...");
-          signalingObject.postMessage({ type: "offer", sdp: offer.sdp });
+          channel.postMessage({ type: "offer", sdp: offer.sdp });
         });
     }
   </script>
