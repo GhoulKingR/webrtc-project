@@ -3,14 +3,13 @@
   <button onclick="start(this)">start video</button>
   <button id="stream" onclick="stream(this)" disabled>stream video</button>
 
-  <script src="signalobject.js"></script>
+  <script src="signalobject.js"></script>         <!-- new change -->
   <script>
-    // get video elements
     const local = document.querySelector("video#local");
     let peerConnection;
 
-    const signalingObject = new SignalServer("stream-video");
-    signalingObject.onmessage = e => {
+    const channel = new SignalServer("stream-video");     // <- new change
+    channel.onmessage = e => {
       if (e.data.type === "icecandidate") {
         peerConnection?.addIceCandidate(e.data.candidate);
       } else if (e.data.type === "answer") {
@@ -41,7 +40,7 @@
             sdpMLineIndex: e.candidate.sdpMLineIndex,
           };
         }
-        signalingObject.postMessage({ type: "icecandidate", candidate });
+        channel.postMessage({ type: "icecandidate", candidate });
       });
 
       local.srcObject.getTracks()
@@ -51,7 +50,7 @@
         .then(async offer => {
           await peerConnection.setLocalDescription(offer);
           console.log("Created offer, sending...");
-          signalingObject.postMessage({ type: "offer", sdp: offer.sdp });
+          channel.postMessage({ type: "offer", sdp: offer.sdp });
         });
     }
   </script>

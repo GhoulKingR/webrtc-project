@@ -30,6 +30,8 @@ function handleConnection(ws) {
   });
   ws.on('close', () => {
     console.log('Client has disconnected!');
-    if (channel !== "") channels[channel] = channels[channel].filter((_, i) => i !== id);
+    if (channel !== "") {
+      channels[channel] = channels[channel].filter((_, i) => i !== id);
+    }
   });
 }

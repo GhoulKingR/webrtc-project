@@ -5,12 +5,12 @@
   <script>
     // get video elements
     const remote = document.querySelector("video#remote");
-    let remotePC;
+    let peerConnection;
 
     const channel = new BroadcastChannel("stream-video");
     channel.onmessage = e => {
       if (e.data.type === "icecandidate") {
-        remotePC?.addIceCandidate(e.data.candidate)
+        peerConnection?.addIceCandidate(e.data.candidate)
       } else if (e.data.type === "offer") {
         console.log("Received offer")
         handleOffer(e.data)
@@ -18,9 +18,9 @@
     }
 
     function handleOffer(offer) {
-      remotePC = new RTCPeerConnection();
-      remotePC.addEventListener("track", e => remote.srcObject = e.streams[0]);
-      remotePC.addEventListener("icecandidate", e => {
+      peerConnection = new RTCPeerConnection();
+      peerConnection.addEventListener("track", e => remote.srcObject = e.streams[0]);
+      peerConnection.addEventListener("icecandidate", e => {
         let candidate = null;
         if (e.candidate !== null) {
           candidate = {
@@ -31,10 +31,10 @@
         }
         channel.postMessage({ type: "icecandidate", candidate })
       });
-      remotePC.setRemoteDescription(offer)
-        .then(() => remotePC.createAnswer())
+      peerConnection.setRemoteDescription(offer)
+        .then(() => peerConnection.createAnswer())
         .then(async answer => {
-          await remotePC.setLocalDescription(answer);
+          await peerConnection.setLocalDescription(answer);
           console.log("Created answer, sending...")
           channel.postMessage({
             type: "answer",

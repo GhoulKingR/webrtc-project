@@ -1,14 +1,13 @@
 <body>
   <video id="remote" controls></video>
   
-  <script src="signalobject.js"></script>
+  <script src="signalserverclass.js"></script>          <!-- new change -->
   <script>
-    // get video elements
     const remote = document.querySelector("video#remote");
     let peerConnection;
 
-    const signalingObject = new SignalServer("stream-video");
-    signalingObject.onmessage = e => {
+    const channel = new SignalServer("stream-video");     // <- new change
+    channel.onmessage = e => {
       if (e.data.type === "icecandidate") {
         peerConnection?.addIceCandidate(e.data.candidate);
       } else if (e.data.type === "offer") {
@@ -29,14 +28,14 @@
             sdpMLineIndex: e.candidate.sdpMLineIndex,
           };
         }
-        signalingObject.postMessage({ type: "icecandidate", candidate });
+        channel.postMessage({ type: "icecandidate", candidate });
       });
       peerConnection.setRemoteDescription(offer)
         .then(() => peerConnection.createAnswer())
         .then(async answer => {
           await peerConnection.setLocalDescription(answer);
           console.log("Created answer, sending...");
-          signalingObject.postMessage({
+          channel.postMessage({
             type: "answer",
             sdp: answer.sdp,
           });
