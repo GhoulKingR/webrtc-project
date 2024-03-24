@@ -29,7 +29,11 @@
 
     function stream(e) {
       e.disabled = true;
-      peerConnection = new RTCPeerConnection();  // local peer connection
+
+      const config = {
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      };
+      peerConnection = new RTCPeerConnection(config);  // local peer connection
 
       // add ice candidate event listener
       peerConnection.addEventListener("icecandidate", e => {

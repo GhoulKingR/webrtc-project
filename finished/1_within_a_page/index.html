@@ -23,8 +23,11 @@
       // disable the stream button
       e.disabled = true;
       
-      const localPeerConnection = new RTCPeerConnection();  // local peer
-      const remotePeerConnection = new RTCPeerConnection();  // remote peer
+      const config = {
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      };
+      const localPeerConnection = new RTCPeerConnection(config);  // local peer
+      const remotePeerConnection = new RTCPeerConnection(config);  // remote peer
 
       // if an icecandidate event is triggered in a peer add the ice candidate to the other peer
       localPeerConnection.addEventListener("icecandidate", e => { console.log("Local:", e.candidate); remotePeerConnection.addIceCandidate(e.candidate) });
