@@ -17,8 +17,10 @@
     }
 
     function handleOffer(offer) {
-      
-      peerConnection = new RTCPeerConnection();
+      const config = {
+        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
+      };
+      peerConnection = new RTCPeerConnection(config);
       peerConnection.addEventListener("track", e => remote.srcObject = e.streams[0]);
       peerConnection.addEventListener("icecandidate", e => {
         let candidate = null;

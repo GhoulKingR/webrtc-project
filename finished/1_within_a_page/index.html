@@ -30,8 +30,8 @@
       const remotePeerConnection = new RTCPeerConnection(config);  // remote peer
 
       // if an icecandidate event is triggered in a peer add the ice candidate to the other peer
-      localPeerConnection.addEventListener("icecandidate", e => { console.log("Local:", e.candidate); remotePeerConnection.addIceCandidate(e.candidate) });
-      remotePeerConnection.addEventListener("icecandidate", e => { console.log("Remote:", e.candidate); localPeerConnection.addIceCandidate(e.candidate) });
+      localPeerConnection.addEventListener("icecandidate", e => remotePeerConnection.addIceCandidate(e.candidate));
+      remotePeerConnection.addEventListener("icecandidate", e => localPeerConnection.addIceCandidate(e.candidate));
 
       // if the remote peer detects a track in the connection, it forwards it to the remote video element
       remotePeerConnection.addEventListener("track", e => remote.srcObject = e.streams[0]);

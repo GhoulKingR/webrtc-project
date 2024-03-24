@@ -37,17 +37,17 @@
 
       // add ice candidate event listener
       peerConnection.addEventListener("icecandidate", e => {
-        // let candidate = null;
+        let candidate = null;
         
-        // // prepare a candidate object that can be passed through browser channel
-        // if (e.candidate !== null) {
-        //   candidate = {
-        //     candidate: e.candidate.candidate,
-        //     sdpMid: e.candidate.sdpMid,
-        //     sdpMLineIndex: e.candidate.sdpMLineIndex,
-        //   };
-        // }
-        channel.postMessage({ type: "icecandidate", candidate: e.candidate });
+        // prepare a candidate object that can be passed through browser channel
+        if (e.candidate !== null) {
+          candidate = {
+            candidate: e.candidate.candidate,
+            sdpMid: e.candidate.sdpMid,
+            sdpMLineIndex: e.candidate.sdpMLineIndex,
+          };
+        }
+        channel.postMessage({ type: "icecandidate", candidate });
       });
 
       // add media tracks to the peer connection
