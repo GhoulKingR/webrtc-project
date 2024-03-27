@@ -1,5 +1,10 @@
-# Running this project
+# Step 1: within a page
+This folder has an _index.html_ page that is the entire application.
 
-*cd* into this directory and run `npx serve .`. When you run this command, it will tell you which URL is hosting the project.
+## Running the application
+To get the application running, you need to host the HTML scripts. To host the HTML scripts, run this command in the _1_within_a_page_ directory:
+```bash
+npx serve .
+```
 
-After running the command, open the URL in your browser to see the web app.
+After running the command, open the URL hosting the files in your browser.
