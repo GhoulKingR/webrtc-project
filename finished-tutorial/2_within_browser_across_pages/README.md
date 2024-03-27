@@ -1,7 +1,10 @@
-# Running this project
+# Step 2: within browser across pages
+This directory has a _streamer.html_ page that represents a streamer and an _index.html_ page that represents a viewer.
 
-*cd* into this directory and run `npx serve .`. When you run this command, it will tell you which URL is hosting the project.
+## Running the project
+To get the project running, you need to host the HTML scripts. To host the HTML scripts, run this command in _2_within_browser_across_pages_ directory:
+```bash
+npx serve .
+```
 
-After running the command, open the URL in your browser to see the web app.
-
-This directory has a _streamer.html_ page that represents the streamer, and an _index.html_ page that represents the viewer. You need to open these two pages in the same browser for the application to work.
+After running the command, open the URL hosting the files in your browser. For the web application to function correctly, you need to open these two pages in the same browser.
