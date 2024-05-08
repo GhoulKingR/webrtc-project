@@ -1,2 +1,3 @@
-outlines/
 node_modules/
+*.outline.md
+.DS_Store
