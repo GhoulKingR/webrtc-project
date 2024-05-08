@@ -3,7 +3,7 @@
   <button onclick="start(this)">start video</button>
   <button id="stream" onclick="stream(this)" disabled>stream video</button>
 
-  <script src="signalserverclass.js"></script>         <!-- new change -->
+  <script src="/3_with_signal_server/signalserverclass.js"></script>         <!-- new change -->
   <script>
     const local = document.querySelector("video#local");
     let peerConnection;
@@ -30,9 +30,7 @@
     function stream(e) {
       e.disabled = true;
       
-      const config = {
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-      };
+      const config = {};
       peerConnection = new RTCPeerConnection(config);  // local peer connection
 
       peerConnection.addEventListener("icecandidate", e => {

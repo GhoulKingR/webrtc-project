@@ -23,9 +23,7 @@
       // disable the stream button
       e.disabled = true;
       
-      const config = {
-        iceServers: [{ url: "stun:stun.1.google.com:19302" }]
-      };
+      const config = {};
       const localPeerConnection = new RTCPeerConnection(config);  // local peer
       const remotePeerConnection = new RTCPeerConnection(config);  // remote peer
 
